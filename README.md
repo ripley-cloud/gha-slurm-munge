@@ -1,4 +1,4 @@
-#JWT Signing Bot for GHA Slurm Integration
+# JWT Signing Bot for GHA Slurm Integration
 
 This is a simple web app designed to live inside of your Munge domain that will provision an ephemeral GitHub Actions Runner on behalf of a user.
 
