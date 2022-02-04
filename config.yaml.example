@@ -1,0 +1,35 @@
+jobTemplate: | 
+  #!/bin/bash
+  function checkForRunning(){
+    sleep 120
+    RUNNING=$(grep Running %LOG_FILE% | wc -l)
+    if [ $RUNNING -eq 0 ]; then
+        echo "Does not look like GHA found a job to work on!"
+        kill $$
+    fi
+  }
+  set -x
+  hostname
+  export HOME=/tmp/home/$USER
+  echo "GHA Runner is loading..."
+  echo $HOME
+  cd $HOME
+  pwd
+  mkdir gha
+  cd gha
+  cp /experiment/util/actions-runner-linux-x64-2.285.1.tar.gz .
+  tar xzf actions-runner-linux-x64-2.285.1.tar.gz
+  TOKEN=%LAUNCH_TOKEN%
+  GHTOKEN=$(curl -s -X POST -H "Authorization: $TOKEN" https://ci.in.ripley.cloud/gha/runner | jq -r '.token')
+  echo  %RUNNER_CONFIG_LINE%
+  ./config.sh %RUNNER_CONFIG_LINE%
+  checkForRunning &
+  ./run.sh
+ 
+logging: DEBUG
+ghaSharedSecret: ChangeThisToSomethingSecret
+
+#Mapping between GitHub Users and name of users in the munge domai
+repositories:
+  - gitHubURL: https://github.com/ripley-cloud/test-project
+    slurmUser: ci-runner
